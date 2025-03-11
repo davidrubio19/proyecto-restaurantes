@@ -1,0 +1,6 @@
+pytesseract
+pdfplumber
+flask
+sqlalchemy
+requests
+pandas

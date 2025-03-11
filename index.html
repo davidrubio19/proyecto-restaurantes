@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurantes y Menús</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Descubre los mejores restaurantes</h1>
+            <form id="searchForm">
+                <label for="location">Ubicación:</label>
+                <input type="text" id="location" placeholder="Ej: Madrid">
+                
+                <label for="cuisine_type">Tipo de cocina:</label>
+                <input type="text" id="cuisine_type" placeholder="Ej: Mediterráneo">
+                
+                <button type="submit">Buscar</button>
+            </form>
+        </header>
+
+        <div id="results">
+            <!-- Aquí se mostrarán los resultados de la búsqueda -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $('#searchForm').submit(function(event) {
+            event.preventDefault();
+
+            var location = $('#location').val();
+            var cuisine_type = $('#cuisine_type').val();
+
+            $.ajax({
+                url: '/search',
+                data: {
+                    location: location,
+                    cuisine_type: cuisine_type
+                },
+                method: 'GET',
+                success: function(response) {
+                    $('#results').html('');
+                    if (response.length > 0) {
+                        response.forEach(function(restaurant) {
+                            var resultHTML = `
+                                <div class="restaurant">
+                                    <h3>${restaurant.restaurant_name}</h3>
+                                    <p><strong>Ubicación:</strong> ${restaurant.location}</p>
+                                    <p><strong>Cocina:</strong> ${restaurant.cuisine_type}</p>
+                                    <h4>Menú del día</h4>
+                                    <ul>
+                                        ${restaurant.menus.map(menu => `
+                                            <li>${menu.description} - Precio: ${menu.price}€</li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                            $('#results').append(resultHTML);
+                        });
+                    } else {
+                        $('#results').html('<p>No se encontraron restaurantes.</p>');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
